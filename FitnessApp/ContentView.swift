@@ -31,11 +31,11 @@ struct HomeView: View {
                 NextView()
                 // scale view
                 ScaleView( progress: $progress)
-                    .frame(height: UIScreen.screenWidth - 44)
+                    .frame(height: UIScreen.screenWidth)
                 // custom tab view
             }
             Spacer()
-            CustomTabView()
+            CustomTabView( progress: $progress)
         }
         .padding(.horizontal)
     }
@@ -202,7 +202,7 @@ struct ScaleView : View {
     @State var startAnimation = false
     let sliderConfig = SliderConfig()
     var body: some View{
-        ZStack{
+        ZStack(alignment:.center){
             Circle()
                 .trim(from: 0.5, to: 1.0)
                 .stroke(Color.lightGray, style: StrokeStyle(lineWidth: 4, lineCap: .round))
@@ -239,8 +239,56 @@ struct ScaleView : View {
 }
 
 struct CustomTabView : View {
+    @Binding var progress: Int
+    @State var showWeightAdjustView = false
     var body: some View{
-        ZStack{
+        HStack(spacing:20){
+            Image(systemName: "house")
+                .foregroundColor(.darkPurple)
+                .padding()
+            
+            Image(systemName: "waveform.path.ecg")
+                .padding()
+            
+            Button(action: {
+                showWeightAdjustView = true
+            }, label: {
+                
+                ZStack{
+                    Circle()
+                        .fill(Color.darkPurple)
+                        .frame(width: 44, height: 44)
+                        .shadow(color: Color.darkPurple.opacity(0.4), radius: /*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/,y: 10)
+                    Image(systemName: "plus")
+                        .foregroundColor(.white)
+                }
+                
+            })
+            
+            Image(systemName: "heart")
+                .padding()
+            
+            Image(systemName: "person")
+                .padding()
+        }
+        .font(.system(size: 24,weight:.light))
+        .sheet(isPresented: $showWeightAdjustView, content: {
+            //weight adjust view
+            WeightAdjustView(progress: $progress)
+        })
+        Spacer()
+    }
+}
+
+struct WeightAdjustView: View {
+    @Binding var progress: Int
+    var body: some View{
+        VStack{
+            // person background
+            // progress text
+            // rular view
+            // slider view
+            // next button view
             
         }
     }
