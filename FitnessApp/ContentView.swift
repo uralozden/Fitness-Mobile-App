@@ -8,25 +8,33 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State var progress: Int = 103
     var body: some View {
-        HomeView()
+        HomeView(progress: $progress)
     }
 }
 
 struct HomeView: View {
+    @Binding var progress: Int
     var body: some View {
         VStack{
             // top bar
             TopBarView()
             // welcome view
             WelcomeView()
-            // graph view
-            GraphView()
-            // next view
-            NextView()
-            // scale view
-            ScaleView()
-            // custom tab view
+            
+            ScrollView(.vertical, showsIndicators: false)
+            {
+                // graph view
+                GraphView()
+                // next view
+                NextView()
+                // scale view
+                ScaleView( progress: $progress)
+                    .frame(height: UIScreen.screenWidth - 44)
+                // custom tab view
+            }
+            Spacer()
             CustomTabView()
         }
         .padding(.horizontal)
@@ -101,38 +109,36 @@ struct GraphView : View {
 
 struct GraphBaackgroundView : View {
     var body: some View{
-        ZStack(alignment: .top ){
-            VStack(spacing:40){
-                HStack{
-                    Spacer()
-                    Text("November")
-                }
-                ForEach(0..<5, id: \.self){ i in
-                    Rectangle()
-                        .fill(Color.lightGray)
-                        .frame(height:1)
-                }
-                
-                HStack{
-                    ForEach(Data.weekArray, id: \.self){ day in
-                        Text(day)
-                        Spacer()
-                    }
-                }
-                .offset(y:-28)
+        VStack(spacing:40){
+            HStack{
+                Spacer()
+                Text("November")
+            }
+            ForEach(0..<5, id: \.self){ i in
+                Rectangle()
+                    .fill(Color.lightGray)
+                    .frame(height:1)
             }
             
             HStack{
-                VStack(alignment:.leading,spacing:22){
-                    Text("  ")
-                    ForEach(Array(stride(from:4,through: 0,by: -1)), id: \.self){i in
-                        Text("\(i * 100)")
-                            .font(.system(size:15,weight:.regular))
-                    }
+                ForEach(Data.weekArray, id: \.self){ day in
+                    Text(day)
+                    Spacer()
                 }
-                .offset(y:-8)
-                Spacer()
             }
+            .offset(y:-28)
+        }
+        
+        HStack{
+            VStack(alignment:.leading,spacing:22){
+                Text("  ")
+                ForEach(Array(stride(from:4,through: 0,by: -1)), id: \.self){i in
+                    Text("\(i * 100)")
+                        .font(.system(size:15,weight:.regular))
+                }
+            }
+            .offset(y:-8)
+            Spacer()
         }
     }
 }
@@ -175,16 +181,59 @@ struct LineGraph : Shape {
 
 struct NextView : View {
     var body: some View{
-        ZStack{
-            
+        HStack(alignment:.top,spacing:44){
+            Image(systemName: "chevron.left")
+            Text("Next Week")
+                .bold()
+            Image(systemName: "chevron.right")
         }
+        Spacer()
     }
 }
 
+struct SliderConfig {
+    let minimumValue: CGFloat = 40.0
+    let maximumValue: CGFloat = 80.0
+    let knobRadius: CGFloat = 25
+}
+
 struct ScaleView : View {
+    @Binding var progress: Int
+    @State var startAnimation = false
+    let sliderConfig = SliderConfig()
     var body: some View{
         ZStack{
+            Circle()
+                .trim(from: 0.5, to: 1.0)
+                .stroke(Color.lightGray, style: StrokeStyle(lineWidth: 4, lineCap: .round))
             
+            Circle()
+                .trim(from: 0.5, to: 1.0)
+                .stroke(Color.lightGray, style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                .scaleEffect(0.9)
+            
+            Circle()
+                .trim(from: 0.5, to: 1.0)
+                .stroke(Color.mediumLightGray, style: StrokeStyle(lineWidth: 10, lineCap: .butt ,dash:[2,43]))
+                .scaleEffect(0.80)
+            
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.darkPurple)
+                .frame(width: 12, height: 30)
+                .offset(y:-130)
+            
+            Circle()
+                .trim(from: 0.5, to: startAnimation ? CGFloat(progress)/sliderConfig.maximumValue : 0.0)
+                .stroke(Color.darkPurple, style: StrokeStyle(lineWidth: 16, lineCap: .round))
+                .scaleEffect(0.9)
+            
+            HStack{
+                Text("\(progress)")
+                    .font(.system(size: 40, weight:.black))
+                Text("kg")
+                    .font(.system(size: 40, weight:.regular))
+            }
+            .offset(y:-40)
         }
     }
 }
