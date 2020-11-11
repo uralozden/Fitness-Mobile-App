@@ -331,13 +331,6 @@ struct PersonBackgroundView: View {
 
 struct ProgressTextView: View {
     var body: some View{
-        ZStack{
-            
-        }
-    }
-}
-struct RularView: View {
-    var body: some View{
         HStack{
             Spacer()
             
@@ -351,6 +344,27 @@ struct RularView: View {
                 Spacer()
                 
             }
+        }
+    }
+}
+struct RularView: View {
+    var body: some View{
+        HStack(alignment: .bottom){
+            Spacer()
+            Spacer()
+            ForEach(Array(stride(from:40,through: 80,by: 5)), id: \.self){value in
+                VStack{
+                    Rectangle()
+                        .fill(Color.mediumLightGray)
+                        .frame(width: 1.4, height: value % 10 == 0 ? 20 : 12)
+                
+                    Text("\(value)")
+                        .font(.system(size:15,weight:.bold))
+                        .opacity(value % 10 == 0 ? 1.0 : 0.0)
+                }
+                Spacer()
+            }
+            Spacer()
         }
     }
 }
