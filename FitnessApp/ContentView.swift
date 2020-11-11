@@ -11,8 +11,8 @@ struct ContentView: View {
     @State var progress: Int = 103
     
     var body: some View {
-        //HomeView(progress: $progress)
-        WeightAdjustView(progress: $progress)
+        HomeView(progress: $progress)
+        //WeightAdjustView(progress: $progress)
     }
 }
 
@@ -20,8 +20,7 @@ struct HomeView: View {
     @Binding var progress: Int
     var body: some View {
         VStack{
-            // top bar
-            TopBarView()
+            
             // welcome view
             WelcomeView()
             
@@ -33,41 +32,16 @@ struct HomeView: View {
                 NextView()
                 // scale view
                 ScaleView( progress: $progress)
-                    .frame(height: UIScreen.screenWidth)
-                // custom tab view
+                    .frame(height: UIScreen.screenWidth - 30)
             }
             Spacer()
+            // custom tab view
             CustomTabView( progress: $progress)
         }
         .padding(.horizontal)
     }
 }
 
-struct TopBarView : View {
-    var body: some View{
-        HStack(alignment: .top){
-            ZStack {
-                Circle()
-                    .fill(Color.darkPurple)
-                    .frame(width: 6, height: 6)
-                
-                Circle()
-                    .fill(Color.darkPurple)
-                    .frame(width: 6, height: 6)
-                    .offset(x:8,y:8)
-                Circle()
-                    .fill(Color.darkPurple)
-                    .frame(width: 6, height: 6)
-                    .offset(x:8,y:-8)
-            }
-            Spacer()
-            
-            Circle()
-                .fill(Color.mediumLightGray)
-                .frame(width: 35, height: 35)
-        }
-    }
-}
 
 
 struct WelcomeView : View {
@@ -237,6 +211,11 @@ struct ScaleView : View {
             }
             .offset(y:-40)
         }
+        .onAppear{
+            withAnimation{
+                startAnimation.toggle()
+            }
+        }
     }
 }
 
@@ -324,7 +303,7 @@ struct PersonBackgroundView: View {
             Image("man")
                 .resizable()
                 .scaledToFit()
-                .offset(y:10)
+                .offset(y:30)
         }
     }
 }
@@ -342,6 +321,7 @@ struct ProgressTextView: View {
                     .foregroundColor( inRange(value: value) ? .darkPurple : .mediumLightGray)
                     .frame(width: 90)
                     .fixedSize()
+                    .animation(nil)
                 
                 Spacer()
                 
