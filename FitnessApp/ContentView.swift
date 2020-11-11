@@ -452,6 +452,7 @@ struct NextButtonView: View {
                 Text("Next")
                     .foregroundColor(.white)
             }
+            .offset(y:-30)
         }
 
     }
