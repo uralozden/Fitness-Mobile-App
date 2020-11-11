@@ -194,8 +194,8 @@ struct NextView : View {
 }
 
 struct SliderConfig {
-    let minimumValue: CGFloat = 40.0
-    let maximumValue: CGFloat = 80.0
+    let minimumValue: CGFloat = 90.0
+    let maximumValue: CGFloat = 120.0
     let knobRadius: CGFloat = 25
 }
 
@@ -287,15 +287,15 @@ struct WeightAdjustView: View {
     var body: some View{
         VStack(spacing:20){
             // person background
-            PersonBackgroundView()
+            PersonBackgroundView(progress: $progress)
             Text("Weight")
                 .font(.system(size: 22,weight:.semibold))
             // progress text
-            ProgressTextView()
+            ProgressTextView(progress:  $progress)
             // rular view
             RularView()
             // slider view
-            SliderView()
+            SliderView(progress:  $progress)
             // next button view
             NextButtonView()
             
@@ -307,6 +307,7 @@ struct WeightAdjustView: View {
 
 
 struct PersonBackgroundView: View {
+    @Binding var progress: Int
     var body: some View{
         ZStack{
             Circle()
@@ -323,22 +324,23 @@ struct PersonBackgroundView: View {
             Image("man")
                 .resizable()
                 .scaledToFit()
-                .offset(y:20)
+                .offset(y:10)
         }
     }
 }
 
 
 struct ProgressTextView: View {
+    @Binding var progress: Int
     var body: some View{
         HStack{
             Spacer()
             
-            ForEach(Array(stride(from:40,through: 80,by: 10)), id: \.self){value in
-                Text("\(value)")
-                    .font(.system(size:28,weight:.bold))
-                    .foregroundColor(.mediumLightGray)
-                    .frame(width: 56)
+            ForEach(Array(stride(from:90,through: 120,by: 10)), id: \.self){value in
+                Text("\(inRange(value: value) ? progress :  value)")
+                    .font(.system(size: inRange(value: value) ? 32 : 28,weight:.bold))
+                    .foregroundColor( inRange(value: value) ? .darkPurple : .mediumLightGray)
+                    .frame(width: 90)
                     .fixedSize()
                 
                 Spacer()
@@ -346,42 +348,132 @@ struct ProgressTextView: View {
             }
         }
     }
+    
+    func inRange(value:Int) -> Bool{
+        let range = value..<value+10
+        return range.contains(progress)
+    }
 }
 struct RularView: View {
     var body: some View{
         HStack(alignment: .bottom){
             Spacer()
-            Spacer()
-            ForEach(Array(stride(from:40,through: 80,by: 5)), id: \.self){value in
+            ForEach(Array(stride(from:90,through: 120,by: 5)), id: \.self){value in
                 VStack{
                     Rectangle()
                         .fill(Color.mediumLightGray)
-                        .frame(width: 1.4, height: value % 10 == 0 ? 20 : 12)
+                        .frame(width: 1.5, height: value % 10 == 0 ? 20 : 15)
                 
                     Text("\(value)")
-                        .font(.system(size:15,weight:.bold))
+                        .font(.system(size:10,weight:.bold))
                         .opacity(value % 10 == 0 ? 1.0 : 0.0)
                 }
                 Spacer()
             }
-            Spacer()
         }
     }
 }
 
 struct SliderView: View {
+    @Binding var progress: Int
     var body: some View{
-        ZStack{
+        HStack{
+            ForEach(0..<5,id: \.self){ _ in
+                Spacer()
+            }
+                
+            GeometryReader{ geometry in
+                Slider(progress:$progress, width: geometry.size.width)
+            }
+            .frame(height:50)
+            
+            ForEach(0..<5,id: \.self){ _ in
+                Spacer()
+            }
             
         }
     }
 }
 
-struct NextButtonView: View {
+struct Slider:View{
+    @Binding var progress: Int
+    @State var knobPosition: CGFloat = 0.0
+    let width: CGFloat
+    let sliderConfig = SliderConfig()
+    var dragGesture: some Gesture{
+        DragGesture()
+            .onChanged{ value in
+                withAnimation{calculateProgress(xLocation: value.location.x)}
+            }
+    }
+    
+    
+    var body: some View{
+        ZStack(alignment: .leading){
+            RoundedRectangle(cornerRadius: 6)
+                .fill(Color.lightGray)
+                .frame(height:12)
+            KnobView()
+                .offset(x:knobPosition)
+                .gesture(dragGesture)
+        }
+        .onAppear{
+            calculateInitialKnobPosition()
+        }
+    }
+    
+    func calculateInitialKnobPosition(){
+        let tempProgress = (CGFloat(progress) - sliderConfig.minimumValue) / (sliderConfig.maximumValue - sliderConfig.minimumValue)
+        knobPosition = (tempProgress * width) - sliderConfig.knobRadius
+    }
+    
+    func calculateProgress(xLocation: CGFloat){
+        let tempProgress = xLocation/width
+        
+        if tempProgress > 0 && tempProgress <= 1{
+            let roundedProgress = round((tempProgress * (sliderConfig.maximumValue - sliderConfig.minimumValue)) + sliderConfig.minimumValue)
+            
+            progress = Int(roundedProgress)
+            
+            let tempPosition = tempProgress * width - sliderConfig.knobRadius
+            knobPosition = tempPosition > -sliderConfig.knobRadius ? tempPosition : -sliderConfig.knobRadius
+        }
+    }
+}
+
+struct KnobView: View {
     var body: some View{
         ZStack{
+            Circle()
+                .fill(Color.lightGray)
             
+            Circle()
+                .strokeBorder(Color.darkPurple,lineWidth: 5)
         }
+        .frame(width: 30, height: 30)
+        .padding(5)
+    }
+}
+
+
+
+struct NextButtonView: View {
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    var body: some View{
+        Button {
+            presentationMode.wrappedValue.dismiss()
+        } label: {
+            ZStack{
+                RoundedRectangle(cornerRadius:25.0)
+                    .fill(Color.darkPurple)
+                    .frame(width:130,height: 50)
+                    .shadow(color:Color.darkPurple.opacity(0.5),radius: 10,y:10)
+                
+                Text("Next")
+                    .foregroundColor(.white)
+            }
+        }
+
     }
 }
 
