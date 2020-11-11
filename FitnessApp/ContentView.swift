@@ -9,8 +9,10 @@ import SwiftUI
 
 struct ContentView: View {
     @State var progress: Int = 103
+    
     var body: some View {
-        HomeView(progress: $progress)
+        //HomeView(progress: $progress)
+        WeightAdjustView(progress: $progress)
     }
 }
 
@@ -283,12 +285,87 @@ struct CustomTabView : View {
 struct WeightAdjustView: View {
     @Binding var progress: Int
     var body: some View{
-        VStack{
+        VStack(spacing:20){
             // person background
+            PersonBackgroundView()
+            Text("Weight")
+                .font(.system(size: 22,weight:.semibold))
             // progress text
+            ProgressTextView()
             // rular view
+            RularView()
             // slider view
+            SliderView()
             // next button view
+            NextButtonView()
+            
+            Spacer()
+            
+        }
+    }
+}
+
+
+struct PersonBackgroundView: View {
+    var body: some View{
+        ZStack{
+            Circle()
+                .fill(Color.lightPurple)
+                .frame(width: UIScreen.screenWidth, height: UIScreen.screenWidth)
+                .scaleEffect(1.5)
+                .offset(y:-130)
+            
+            Image("background_nature")
+                .resizable()
+                .scaledToFit()
+                .offset(y:-70)
+            
+            Image("man")
+                .resizable()
+                .scaledToFit()
+                .offset(y:20)
+        }
+    }
+}
+
+
+struct ProgressTextView: View {
+    var body: some View{
+        ZStack{
+            
+        }
+    }
+}
+struct RularView: View {
+    var body: some View{
+        HStack{
+            Spacer()
+            
+            ForEach(Array(stride(from:40,through: 80,by: 10)), id: \.self){value in
+                Text("\(value)")
+                    .font(.system(size:28,weight:.bold))
+                    .foregroundColor(.mediumLightGray)
+                    .frame(width: 56)
+                    .fixedSize()
+                
+                Spacer()
+                
+            }
+        }
+    }
+}
+
+struct SliderView: View {
+    var body: some View{
+        ZStack{
+            
+        }
+    }
+}
+
+struct NextButtonView: View {
+    var body: some View{
+        ZStack{
             
         }
     }
